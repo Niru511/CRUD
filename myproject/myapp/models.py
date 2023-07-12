@@ -14,21 +14,22 @@ class Data(models.Model):
     name = models.CharField(max_length=100)
     number = models.CharField(max_length=256)
 
-def encrypt_number(number):
-    cipher = PKCS1_OAEP.new(RSA.import_key(public_key))
-    encrypted = cipher.encrypt(number.encode())
-    return encrypted.hex()
+    def encrypt_number(self,number):
+        cipher = PKCS1_OAEP.new(RSA.import_key(public_key))
+        encrypted = cipher.encrypt(number.encode())
+        return encrypted.hex()
 
-def save(self, *args, **kwargs):
-    encrypted_number = encrypt_number(self.number)
-    self.number = encrypted_number
-    super(Data, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        encrypted_number = self.encrypt_number(self.number)
+        self.number = encrypted_number
+        super(Data, self).save(*args, **kwargs)
 
-def decrypt_number(encrypted):
-    cipher = PKCS1_OAEP.new(RSA.import_key(private_key))
-    decrypted = cipher.decrypt(bytes.fromhex(encrypted))
-    return decrypted.decode()
+    def decrypt_number(self,encrypted_number):
+         
+         cipher = PKCS1_OAEP.new(RSA.import_key(private_key))
+         decrypted = cipher.decrypt(bytes.fromhex(encrypted_number))
+         return decrypted.decode()
 
-def __str__(self):
-    return f"{self.name}: {decrypt_number(self.number)}"
+    def __str__(self):
+         return f"{self.name}"
 
